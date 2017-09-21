@@ -4,6 +4,7 @@ require('dotenv').config();
 const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/collector');
 
 const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
@@ -11,7 +12,9 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     // time: {type: Date, default: Date.now()},
     topic: String,
     payload: String
-}, {collection: 'log'}));
+}, {
+    collection: 'log'
+}));
 
 const topic = '#';
 const exchange = 'mosca';
