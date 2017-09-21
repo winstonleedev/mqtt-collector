@@ -26,7 +26,7 @@ amqp.connect('amqp://localhost', function(err, conn) {
             ch.consume(q.queue, function(msg) {
                 console.log('msg received :', msg.content.toString());
                 let logEntry = new LogEntry({
-                    _id: '' + Date.now() + Math.ceil(Math.random() * 1000),
+                    _id: '' + Date.now() + Math.ceil(Math.random() * 100),
                     topic: msg.fields.routingKey,
                     payload: msg.content.toString()
                 });
