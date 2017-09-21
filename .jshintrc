@@ -1,3 +1,31 @@
 {
-    "esversion": 6
+    "bitwise": true,
+    "camelcase": true,
+    "curly": true,
+    "eqeqeq": true,
+    "forin": true,
+    "immed": true,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "noempty": true,
+    "nonew": true,
+    "regexp": true,
+    "undef": true,
+    "unused": true,
+    "strict": true,
+    "indent": 2,
+    "quotmark": "single",
+    "maxlen": 200,
+    "esnext": true,
+    "evil": true,
+    "globalstrict": true,
+    "smarttabs": true,
+    "sub": true,
+  
+    "node": true,
+  
+    "predef": {
+      "__dirname": false
+    }
 }

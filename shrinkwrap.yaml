@@ -1,0 +1,46 @@
+dependencies:
+  amqplib: 0.5.1
+packages:
+  /amqplib/0.5.1:
+    dependencies:
+      bitsyntax: 0.0.4
+      bluebird: 3.5.0
+      buffer-more-ints: 0.0.2
+      readable-stream: 1.1.14
+    resolution:
+      integrity: sha1-fMz+ur5WwumE6noiQ/fO/m+/xs8=
+  /bitsyntax/0.0.4:
+    dependencies:
+      buffer-more-ints: 0.0.2
+    resolution:
+      integrity: sha1-6xDMb4K4xJDj6FaY8H6D1G4MuoI=
+  /bluebird/3.5.0:
+    resolution:
+      integrity: sha1-eRQg1/VR7qKJdFOop3ZT+WYG1nw=
+  /buffer-more-ints/0.0.2:
+    resolution:
+      integrity: sha1-JrOIXRD6E9t/wBquOquHAZngEkw=
+  /core-util-is/1.0.2:
+    resolution:
+      integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
+  /inherits/2.0.3:
+    resolution:
+      integrity: sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
+  /isarray/0.0.1:
+    resolution:
+      integrity: sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8=
+  /readable-stream/1.1.14:
+    dependencies:
+      core-util-is: 1.0.2
+      inherits: 2.0.3
+      isarray: 0.0.1
+      string_decoder: 0.10.31
+    resolution:
+      integrity: sha1-fPTFTvZI44EwhMY23SB54WbAgdk=
+  /string_decoder/0.10.31:
+    resolution:
+      integrity: sha1-YuIDvEF2bGwoyfyEMB2rHFMQ+pQ=
+registry: 'https://registry.npmjs.org/'
+shrinkwrapVersion: 3
+specifiers:
+  amqplib: ^0.5.1
