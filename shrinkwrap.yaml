@@ -1,5 +1,6 @@
 dependencies:
   amqplib: 0.5.1
+  containerized: 1.0.2
   dotenv: 4.0.0
   mongoose: 4.11.12
   promise: 8.0.1
@@ -40,6 +41,9 @@ packages:
   /buffer-shims/1.0.0:
     resolution:
       integrity: sha1-mXjOMXOIxkmth5MCjDR37wRKi1E=
+  /containerized/1.0.2:
+    resolution:
+      integrity: sha1-3+0xSeq1BC7wsG6FHH2PTcZ1DYg=
   /core-util-is/1.0.2:
     resolution:
       integrity: sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
@@ -187,6 +191,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapVersion: 3
 specifiers:
   amqplib: ^0.5.1
+  containerized: ^1.0.2
   dotenv: ^4.0.0
   mongoose: ^4.11.12
   promise: ^8.0.1

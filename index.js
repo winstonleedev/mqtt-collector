@@ -3,9 +3,15 @@
 require('dotenv').config();
 const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
+const containerized = require('containerized');
+var host = 'localhost';
+
+if (containerized()) {
+  host = '172.17.0.1';
+}
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/collector');
+mongoose.connect('mongodb://' + host + '/collector');
 
 const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     _id: Number,
@@ -19,14 +25,14 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
 const topic = '#';
 const exchange = 'mosca';
 
-amqp.connect('amqp://localhost', function(err, conn) {
+amqp.connect('amqp://' + host, function(err, conn) {
     conn.createChannel(function(err, ch) {
 
         // ch.assertExchange(ex, 'topic', {durable: false})
-        ch.assertQueue('', {exclusive: false}, function(err, q) {
-            console.log('Waiting for messages, to exit press ctrl + C', q.queue);
-            ch.bindQueue(q.queue, exchange, topic);
-            ch.consume(q.queue, function(msg) {
+        ch.assertQueue('', {exclusive: false}, function(err, queueInfo) {
+            console.log('Waiting for messages, to exit press ctrl + C', queueInfo.queue);
+            ch.bindQueue(queueInfo.queue, exchange, topic);
+            ch.consume(queueInfo.queue, function(msg) {
                 console.log('msg received :', msg.content.toString());
                 let logEntry = new LogEntry({
                     _id: '' + Date.now() + Math.ceil(Math.random() * 100),
