@@ -5,14 +5,16 @@ const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
 
-var host = 'localhost';
-
+// Configure host name for mongo and AMQP
+var defaultHost = 'localhost';
 if (containerized()) {
-  host = '172.17.0.1';
+  defaultHost = '172.17.0.1';
 }
+const mongodbHost = process.env.MONGODB_HOST || defaultHost;
+const amqpHost = process.env.AMQP_HOST || defaultHost;
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://' + host + '/collector');
+mongoose.connect('mongodb://' + mongodbHost + '/collector');
 
 const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     _id: Number,
@@ -27,7 +29,7 @@ const topic = '#';
 const exchange = 'mosca';
 
 
-amqp.connect('amqp://' + host, function(err, conn) {
+amqp.connect('amqp://' + amqpHost, function(err, conn) {
     conn.createChannel(function(err, ch) {
 
         // ch.assertExchange(ex, 'topic', {durable: false})
