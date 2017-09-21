@@ -4,6 +4,8 @@ require('dotenv').config();
 const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
+const sleep = require('system-sleep');
+
 var host = 'localhost';
 
 if (containerized()) {
@@ -24,6 +26,7 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
 
 const topic = '#';
 const exchange = 'mosca';
+
 
 amqp.connect('amqp://' + host, function(err, conn) {
     conn.createChannel(function(err, ch) {
