@@ -4,7 +4,6 @@ require('dotenv').config();
 const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
-const sleep = require('system-sleep');
 
 var host = 'localhost';
 
