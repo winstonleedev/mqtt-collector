@@ -39,10 +39,10 @@ amqp.connect('amqp://' + amqpHost, function(err, conn) {
 
         // ch.assertExchange(ex, 'topic', {durable: false})
         ch.assertQueue('', {exclusive: false}, function(err, queueInfo) {
-            console.log('Waiting for messages, to exit press ctrl + C', queueInfo.queue);
+            debug('Waiting for messages, to exit press ctrl + C', queueInfo.queue);
             ch.bindQueue(queueInfo.queue, exchange, topic);
             ch.consume(queueInfo.queue, function(msg) {
-                console.log('msg received :', msg.content.toString());
+                debug('msg received :', msg.content.toString());
                 let logEntry = new LogEntry({
                     _id: '' + Date.now() + Math.ceil(Math.random() * 100),
                     topic: msg.fields.routingKey,
