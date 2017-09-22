@@ -4,6 +4,7 @@ require('dotenv').config();
 const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
+const debug = require('debug')('collector');
 
 // Configure host name for mongo and AMQP
 var defaultHost = 'localhost';
@@ -55,7 +56,10 @@ amqp.connect('amqp://' + amqpHost, function(err, conn) {
                 }
 
                 logEntry.save((err, doc) => {
-                    console.log('Saved to mongo, err + doc:', err, doc);
+                    if (err) {
+                        debug('Error saving:', err);
+                    }
+                    debug('Saved to mongo, doc:', err, doc);
                     ch.ack(msg);
                 });
             }, {noAck: false});

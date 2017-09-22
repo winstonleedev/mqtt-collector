@@ -1,6 +1,7 @@
 dependencies:
   amqplib: 0.5.1
   containerized: 1.0.2
+  debug: 3.0.1
   dotenv: 4.0.0
   mongoose: 4.11.12
   promise: 8.0.1
@@ -67,6 +68,11 @@ packages:
       ms: 2.0.0
     resolution:
       integrity: sha1-5zFTHKLt4n0YgiJCfaF4IdaP9Pw=
+  /debug/3.0.1:
+    dependencies:
+      ms: 2.0.0
+    resolution:
+      integrity: sha512-6nVc6S36qbt/mutyt+UGMnawAMrPDZUPQjRZI3FS9tCtDRhvxJbK79unYBLPi+z5SLXQ3ftoVBFCblQtNSls8w==
   /dotenv/4.0.0:
     resolution:
       integrity: sha1-hk7xN5rO1Vzm+V3r7NzhefegzR0=
@@ -215,6 +221,7 @@ shrinkwrapVersion: 3
 specifiers:
   amqplib: ^0.5.1
   containerized: ^1.0.2
+  debug: ^3.0.1
   dotenv: ^4.0.0
   mongoose: ^4.11.12
   promise: ^8.0.1

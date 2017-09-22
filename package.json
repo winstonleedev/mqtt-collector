@@ -12,6 +12,7 @@
   "dependencies": {
     "amqplib": "^0.5.1",
     "containerized": "^1.0.2",
+    "debug": "^3.0.1",
     "dotenv": "^4.0.0",
     "mongoose": "^4.11.12",
     "promise": "^8.0.1",
