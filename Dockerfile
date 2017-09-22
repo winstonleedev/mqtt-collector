@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:4
 LABEL maintainer="Thanh Phu <nvtphu+docker@gmail.com>"
 
 WORKDIR /app
