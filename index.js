@@ -10,8 +10,12 @@ var defaultHost = 'localhost';
 if (containerized()) {
   defaultHost = '172.17.0.1';
 }
+
 const mongodbHost = process.env.MONGODB_HOST || defaultHost;
 const amqpHost = process.env.AMQP_HOST || defaultHost;
+
+console.log('MongoDB host: ', mongodbHost);
+console.log('AMQP host: ', amqpHost);
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://' + mongodbHost + '/collector');
