@@ -35,6 +35,10 @@ const exchange = 'mosca';
 
 
 amqp.connect('amqp://' + amqpHost, function(err, conn) {
+    if (err || !conn) {
+        return;
+    }
+
     conn.createChannel(function(err, ch) {
 
         // ch.assertExchange(ex, 'topic', {durable: false})
