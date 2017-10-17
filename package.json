@@ -14,6 +14,7 @@
     "containerized": "^1.0.2",
     "debug": "^3.0.1",
     "dotenv": "^4.0.0",
+    "kafka-node": "^2.2.3",
     "mongoose": "^4.11.12",
     "promise": "^8.0.1",
     "system-sleep": "^1.3.6"

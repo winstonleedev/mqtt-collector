@@ -1,23 +1,44 @@
 #!/usr/bin/env node
 'use strict';
 require('dotenv').config();
-const amqp = require('amqplib/callback_api');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
 const debug = require('debug')('collector');
+const kafka = require('kafka-node');
 
-// Configure host name for mongo and AMQP
+// Configure host name for mongo and Kafka
 var defaultHost = 'localhost';
 if (containerized()) {
-  defaultHost = '172.17.0.1';
+    defaultHost = '172.17.0.1';
 }
 
 const mongodbHost = process.env.MONGODB_HOST || defaultHost;
-const amqpHost = process.env.AMQP_HOST || defaultHost;
+const kafkaHost = process.env.KAFKA_HOST || (defaultHost + ':2181');
 
 console.log('MongoDB host: ', mongodbHost);
-console.log('AMQP host: ', amqpHost);
+console.log('Kafka host: ', kafkaHost);
 
+// Kafka consumer init
+const topic = 'thanhphu/topic';
+
+const Consumer = kafka.Consumer;
+const client = new kafka.Client(
+    kafkaHost
+);
+const consumer = new Consumer(
+    client,
+    [
+        {
+            topic: topic,
+            partition: 0
+        },
+    ],
+    {
+        autoCommit: false
+    }
+);
+
+// Mongoose init
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://' + mongodbHost + '/collector', {
     useMongoClient: true
@@ -32,42 +53,26 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     collection: 'log'
 }));
 
-const topic = '#';
-const exchange = 'mosca';
-
-amqp.connect('amqp://' + amqpHost, function(err, conn) {
-    if (err || !conn) {
-        return;
+consumer.addTopics([topic], function (err, added) {
+    if (err) {
+        debug('Error adding topic: ', err);
+    } else {
+        debug('Topic added: ', topic, added);
     }
+});
 
-    conn.createChannel(function(err, ch) {
+consumer.on('message', function(msg) {
+    debug('msg received :', msg.toString());
+    let logEntry = new LogEntry({
+        _id: '' + Date.now() + Math.ceil(Math.random() * 100),
+        topic: 'dummy-topic',
+        payload: msg.toString()
+    });
 
-        // ch.assertExchange(ex, 'topic', {durable: false})
-        ch.assertQueue('collector-1', {exclusive: false, durable: true}, function(err, queueInfo) {
-            debug('Waiting for messages, to exit press ctrl + C', queueInfo.queue);
-            ch.bindQueue(queueInfo.queue, exchange, topic);
-            ch.consume(queueInfo.queue, function(msg) {
-                debug('msg received :', msg.content.toString());
-                let logEntry = new LogEntry({
-                    _id: '' + Date.now() + Math.ceil(Math.random() * 100),
-                    topic: msg.fields.routingKey,
-                    payload: msg.content.toString()
-                });
-
-                // Skip system messages
-                if (msg.fields.routingKey.indexOf('$') >= 0) {
-                    ch.ack(msg);
-                    return;
-                }
-
-                logEntry.save((err, doc) => {
-                    if (err) {
-                        debug('Error saving:', err);
-                    }
-                    debug('Saved to mongo, doc:', err, doc);
-                    ch.ack(msg);
-                });
-            }, {noAck: false});
-        });
+    logEntry.save((err, doc) => {
+        if (err) {
+            debug('Error saving:', err);
+        }
+        debug('Saved to mongo, doc:', err, doc);
     });
 });
