@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 require('dotenv').config();
+const _ = require('lodash');
 const mongoose = require('mongoose');
 const containerized = require('containerized');
 const debug = require('debug')('collector');
@@ -19,19 +20,15 @@ console.log('MongoDB host: ', mongodbHost);
 console.log('Kafka host: ', kafkaHost);
 
 // Kafka consumer init
-const topic = 'thanhphu/topic';
+const topic = 'thanhphu_topic';
 
-const Consumer = kafka.Consumer;
 const client = new kafka.Client(
     kafkaHost
 );
+const Consumer = kafka.Consumer;
 const consumer = new Consumer(
     client,
     [
-        {
-            topic: topic,
-            partition: 0
-        },
     ],
     {
         autoCommit: false
@@ -53,26 +50,38 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     collection: 'log'
 }));
 
+// List topics
+client.once('connect', function () {
+	client.loadMetadataForTopics([], function (error, results) {
+	  if (error) {
+	  	return console.error(error);
+	  }
+	  console.log('%j', _.get(results, '1.metadata'));
+	});
+});
+
+// Add topics to consumer
 consumer.addTopics([topic], function (err, added) {
     if (err) {
-        debug('Error adding topic: ', err);
+        debug('Error subscribing to topic: ', err);
+        process.exit(1);
     } else {
         debug('Topic added: ', topic, added);
+        consumer.on('message', function(msg) {
+            debug('msg received :', msg);
+            let logEntry = new LogEntry({
+                _id: '' + Date.now() + Math.ceil(Math.random() * 100),
+                topic: msg.topic,
+                payload: msg.value.toString()
+            });
+        
+            logEntry.save((err, doc) => {
+                if (err) {
+                    debug('Error saving:', err);
+                }
+                debug('Saved to mongo, doc:', err, doc);
+            });
+        });        
     }
 });
 
-consumer.on('message', function(msg) {
-    debug('msg received :', msg.toString());
-    let logEntry = new LogEntry({
-        _id: '' + Date.now() + Math.ceil(Math.random() * 100),
-        topic: 'dummy-topic',
-        payload: msg.toString()
-    });
-
-    logEntry.save((err, doc) => {
-        if (err) {
-            debug('Error saving:', err);
-        }
-        debug('Saved to mongo, doc:', err, doc);
-    });
-});
