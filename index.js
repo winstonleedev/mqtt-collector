@@ -33,7 +33,7 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
 }));
 
 const topic = '#';
-const exchange = 'mosca';
+const exchange = 'amq.topic';
 
 amqp.connect('amqp://' + amqpHost, function(err, conn) {
     if (err || !conn) {
@@ -42,7 +42,6 @@ amqp.connect('amqp://' + amqpHost, function(err, conn) {
 
     conn.createChannel(function(err, ch) {
 
-        // ch.assertExchange(ex, 'topic', {durable: false})
         ch.assertQueue('collector-1', {exclusive: false, durable: true}, function(err, queueInfo) {
             debug('Waiting for messages, to exit press ctrl + C', queueInfo.queue);
             ch.bindQueue(queueInfo.queue, exchange, topic);
