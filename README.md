@@ -24,7 +24,7 @@ By default, connects to RabbitMQ cluster on `localhost:5672, localhost:5673, loc
 
 ## Editing config
 ```
-vi rascal-cofig.js
+vi rascal-config.js
 ```
 
 ```js
@@ -59,6 +59,8 @@ module.exports = {
     }
 }
 ```
-
+# Branches
+* **master** connects to RabbitMQ
+* **kafka** uses Kafka instead of RabbitMQ
 # License
 [ISC](LICENSE.txt)
