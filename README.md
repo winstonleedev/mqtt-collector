@@ -2,6 +2,7 @@
 
 * Collects MQTT messages from RabbitMQ and save them to MongoDB, used in [mqtt-rabbitmq-cluster](https://github.com/thanhphu/mqtt-rabbitmq-cluster).
 * Uses [Rascal](https://github.com/guidesmiths/rascal) to connect to the cluster, provide high availability since Rascal automatically retry connections and provide sensible defaults for connecting to RabbitMQ
+* In addition to Rascal, have logic to select least connected to RabbitMQ server by querying RabbitMQ's management API (requires management module installed)
 * Rascal also provide mappings inside config instead of code, providing better readability
 
 # Usage
