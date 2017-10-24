@@ -30,7 +30,9 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     collection: 'log'
 }));
 
+debug('Config AMQP hosts:', rascalConfig.hosts);
 rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
+    debug('Selected AMQP host:', hostName);
     // Connect to AMQP with Rascal
     Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
         if (err) {

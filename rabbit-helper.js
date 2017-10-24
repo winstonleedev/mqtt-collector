@@ -40,7 +40,7 @@ module.exports.selectRabbit = function (hosts, type, connect) {
     }
 
     function _selectNode(nodesInfo, type) {
-        if (nodesInfo) {
+        if (nodesInfo && nodesInfo.length) {
             // Count of all types of conection to all nodes
             // Example: Object {rabbit@rabbit1: 2, rabbit@rabbit2: 1, rabbit@rabbit3: 1}
             var allCount = _.countBy(nodesInfo, (node) => node.node);
@@ -57,6 +57,9 @@ module.exports.selectRabbit = function (hosts, type, connect) {
             var leastConnectedNode = _selectLeastConnectedNode(allCount, typeCount);
             var leastConnectedNodeName = _extractHostName(leastConnectedNode);
             connect(leastConnectedNodeName);
+        } else {
+            // Nothing from API, connects to a random node
+            connect(hosts[_.random(0, hosts.length - 1)]);
         }
     }
 
@@ -84,5 +87,5 @@ module.exports.selectRabbit = function (hosts, type, connect) {
         });
     }
 
-    _getNodesInfo(hosts, 'subscriber');
+    _getNodesInfo(hosts, type);
 };
