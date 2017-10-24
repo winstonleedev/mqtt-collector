@@ -14,7 +14,7 @@ if (containerized()) {
 }
 
 const mongodbHost = process.env.MONGODB_HOST || defaultHost;
-console.log('MongoDB host: ', mongodbHost);
+debug('MongoDB host: ', mongodbHost);
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://' + mongodbHost + '/collector', {
@@ -35,6 +35,7 @@ Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig), function (err, brok
         debug('Error ', err);
         return;
     }
+    debug('Collector is now UP!');
 
     broker.subscribe('s1', function (err, subscription) {
         if (err) {
