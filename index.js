@@ -72,5 +72,8 @@ rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
             }).on('error', console.error);
         }).on('error', console.error);
     });
+}, () => {
+    // Can't communicate with rabbitMQ, try to restart
+    process.exit(1);
 });
 
