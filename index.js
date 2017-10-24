@@ -27,8 +27,8 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     topic: String,
     payload: String
 }, {
-    collection: 'log'
-}));
+        collection: 'log'
+    }));
 
 function init() {
     debug('Config AMQP hosts:', rascalConfig.hosts);
@@ -40,7 +40,7 @@ function init() {
                 debug('Error ', err);
                 return;
             }
-            debug('AMQP host:',hostName);
+            debug('AMQP host:', hostName);
             debug('Collector is now UP!');
 
             broker.subscribe('s1', function (err, subscription) {
@@ -76,4 +76,8 @@ function init() {
     });
 }
 
-setTimeout(init, 10000);
+if (containerized()) {
+    setTimeout(init, 10000);
+} else {
+    init();
+}
