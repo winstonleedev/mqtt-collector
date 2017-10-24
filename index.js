@@ -6,6 +6,7 @@ const debug = require('debug')('collector');
 const mongoose = require('mongoose');
 const Rascal = require('rascal');
 const rascalConfig = require('./rascal-config');
+const rabbitHelper = require('./rabbit-helper.js');
 
 // Configure host name for mongo
 var defaultHost = 'localhost';
@@ -14,7 +15,7 @@ if (containerized()) {
 }
 
 const mongodbHost = process.env.MONGODB_HOST || defaultHost;
-debug('MongoDB host: ', mongodbHost);
+debug('MongoDB host:', mongodbHost);
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://' + mongodbHost + '/collector', {
@@ -29,41 +30,45 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     collection: 'log'
 }));
 
-// Connect to AMQP with Rascal
-Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig), function (err, broker) {
-    if (err) {
-        debug('Error ', err);
-        return;
-    }
-    debug('Collector is now UP!');
-
-    broker.subscribe('s1', function (err, subscription) {
+rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
+    // Connect to AMQP with Rascal
+    Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
         if (err) {
             debug('Error ', err);
             return;
         }
+        debug('AMQP host:',hostName);
+        debug('Collector is now UP!');
 
-        subscription.on('message', function (msg, content, ackOrNack) {
-            debug('msg received :', msg.content.toString());
-            let logEntry = new LogEntry({
-                _id: '' + Date.now() + Math.ceil(Math.random() * 100),
-                topic: msg.fields.routingKey,
-                payload: msg.content.toString()
-            });
-
-            // Skip system messages
-            if (msg.fields.routingKey.indexOf('$') >= 0) {
-                ackOrNack();
+        broker.subscribe('s1', function (err, subscription) {
+            if (err) {
+                debug('Error ', err);
                 return;
             }
 
-            logEntry.save((err, doc) => {
-                if (err) {
-                    debug('Error saving:', err);
+            subscription.on('message', function (msg, content, ackOrNack) {
+                debug('msg received :', msg.content.toString());
+                let logEntry = new LogEntry({
+                    _id: '' + Date.now() + Math.ceil(Math.random() * 100),
+                    topic: msg.fields.routingKey,
+                    payload: msg.content.toString()
+                });
+
+                // Skip system messages
+                if (msg.fields.routingKey.indexOf('$') >= 0) {
+                    ackOrNack();
+                    return;
                 }
-                debug('Saved to mongo, doc:', err, doc);
-                ackOrNack();
-            });
+
+                logEntry.save((err, doc) => {
+                    if (err) {
+                        debug('Error saving:', err);
+                    }
+                    debug('Saved to mongo, doc:', err, doc);
+                    ackOrNack();
+                });
+            }).on('error', console.error);
         }).on('error', console.error);
-    }).on('error', console.error);
+    });
 });
+
