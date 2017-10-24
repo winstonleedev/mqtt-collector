@@ -30,50 +30,50 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     collection: 'log'
 }));
 
-debug('Config AMQP hosts:', rascalConfig.hosts);
-rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
-    debug('Selected AMQP host:', hostName);
-    // Connect to AMQP with Rascal
-    Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
-        if (err) {
-            debug('Error ', err);
-            return;
-        }
-        debug('AMQP host:',hostName);
-        debug('Collector is now UP!');
-
-        broker.subscribe('s1', function (err, subscription) {
+function init() {
+    debug('Config AMQP hosts:', rascalConfig.hosts);
+    rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
+        debug('Selected AMQP host:', hostName);
+        // Connect to AMQP with Rascal
+        Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
             if (err) {
                 debug('Error ', err);
                 return;
             }
+            debug('AMQP host:',hostName);
+            debug('Collector is now UP!');
 
-            subscription.on('message', function (msg, content, ackOrNack) {
-                debug('msg received :', msg.content.toString());
-                let logEntry = new LogEntry({
-                    _id: '' + Date.now() + Math.ceil(Math.random() * 100),
-                    topic: msg.fields.routingKey,
-                    payload: msg.content.toString()
-                });
-
-                // Skip system messages
-                if (msg.fields.routingKey.indexOf('$') >= 0) {
-                    ackOrNack();
+            broker.subscribe('s1', function (err, subscription) {
+                if (err) {
+                    debug('Error ', err);
                     return;
                 }
 
-                logEntry.save((err, doc) => {
-                    if (err) {
-                        debug('Error saving:', err);
-                    }
-                    debug('Saved to mongo, doc:', err, doc);
-                    ackOrNack();
-                });
-            }).on('error', console.error);
-        }).on('error', console.error);
-    });
-}, () => {
-    // Can't communicate with rabbitMQ, try to restart
-    process.exit(1);
-});
+                subscription.on('message', function (msg, content, ackOrNack) {
+                    debug('msg received :', msg.content.toString());
+                    let logEntry = new LogEntry({
+                        _id: '' + Date.now() + Math.ceil(Math.random() * 100),
+                        topic: msg.fields.routingKey,
+                        payload: msg.content.toString()
+                    });
 
+                    // Skip system messages
+                    if (msg.fields.routingKey.indexOf('$') >= 0) {
+                        ackOrNack();
+                        return;
+                    }
+
+                    logEntry.save((err, doc) => {
+                        if (err) {
+                            debug('Error saving:', err);
+                        }
+                        debug('Saved to mongo, doc:', err, doc);
+                        ackOrNack();
+                    });
+                }).on('error', console.error);
+            }).on('error', console.error);
+        });
+    });
+}
+
+setTimeout(init, 10000);

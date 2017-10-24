@@ -8,7 +8,7 @@ const request = require('request');
  * type: type of least connection to select, available types:
  *    'publisher': when called from mosca
  *    'subscriber': when called from collector
- * connect: connection callback, takes one parameter - hostname of selected node
+ * success: connection callback, takes one parameter - hostname of selected node
  */
 module.exports.selectRabbit = function (hosts, type, success, failure) {   
     var onceConnect = _.once(success);
