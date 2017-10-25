@@ -1,7 +1,9 @@
 'use strict';
+require('dotenv').config();
 const _ = require('lodash');
 
-const hosts = [
+// Takes AMQP host list from env variables, otherwise use default
+const hosts = (process.env.AMQP_HOST) ? process.env.AMQP_HOST.split(',') : [
     // Run on real machine
     // 'amqp://guest:guest@localhost:5672',
     // 'amqp://guest:guest@localhost:5673',

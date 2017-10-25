@@ -1,5 +1,6 @@
 dependencies:
   amqplib: 0.5.1
+  async: 2.5.0
   containerized: 1.0.2
   debug: 3.0.1
   dotenv: 4.0.0
@@ -597,6 +598,7 @@ registry: 'https://registry.npmjs.org/'
 shrinkwrapVersion: 3
 specifiers:
   amqplib: ^0.5.1
+  async: ^2.5.0
   containerized: ^1.0.2
   debug: ^3.0.1
   dotenv: ^4.0.0
