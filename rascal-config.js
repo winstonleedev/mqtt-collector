@@ -2,6 +2,9 @@
 require('dotenv').config();
 const _ = require('lodash');
 
+const rabbitUsername = process.env.RABBIT_USERNAME || 'guest';
+const rabbitPassword = process.env.RABBIT_PASSWORD || 'guest';
+
 // Takes AMQP host list from env variables, otherwise use default
 const hosts = (process.env.AMQP_HOST) ? process.env.AMQP_HOST.split(',') : [
     // Run on real machine
@@ -19,9 +22,11 @@ const hosts = (process.env.AMQP_HOST) ? process.env.AMQP_HOST.split(',') : [
 
 function exportConfig(hostToUse) {
     if (!hostToUse) {
-        hostToUse = _.map(hosts, (hostName) => `amqp://guest:guest@${hostName}:5672`);
+        hostToUse = _.map(hosts, (hostName) => `amqp://${rabbitUsername}:${rabbitPassword}@${hostName}:5672`);
+    } else if (Array.isArray(hostToUse)) {
+        hostToUse = _.map(hostToUse, (hostName) => `amqp://${rabbitUsername}:${rabbitPassword}@${hostName}:5672`);
     } else {
-        hostToUse = `amqp://guest:guest@${hostToUse}:5672`;
+        hostToUse = `amqp://${rabbitUsername}:${rabbitPassword}@${hostToUse}:5672`;
     }
     return {
         vhosts: {
