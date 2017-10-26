@@ -36,9 +36,15 @@ function init() {
         Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
             if (err) {
                 debug('Error ', err);
+                process.exit(1);
                 return;
             }
             debug('Collector is now UP!');
+
+            broker.on('error', function(err) {
+                console.error('Broker error', err);
+                process.exit(1);
+            });
 
             broker.subscribe('s1', function (err, subscription) {
                 if (err) {
@@ -73,8 +79,4 @@ function init() {
     });
 }
 
-if (containerized()) {
-    setTimeout(init, 10000);
-} else {
-    init();
-}
+init();
