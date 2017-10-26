@@ -18,7 +18,7 @@ function selectNode(hosts, queueInfoList, nodeInfoList, connectionInfoList, type
     // Nothing from API, connects to a random node
     return (_.sample(hosts));
   } else if (_.isEmpty(queueInfoList)) {
-    let nodeNames = _.uniq(_.map(nodeInfoList, extractHostName));
+    let nodeNames = _.uniq(_.map(nodeInfoList, n => extractHostName(n.name)));
     return (_.sample(nodeNames));
   } else {
     // List of all alive nodes
@@ -73,7 +73,13 @@ function selectNode(hosts, queueInfoList, nodeInfoList, connectionInfoList, type
 function callApi(url, host, cb) {
   request({
     url: url,
-    json: true
+    json: true,
+    auth: {
+      user: rabbitUsername,
+      pass: rabbitPassword,
+      sendImmediately: false
+    },
+    timeout: 3000 // 3 secs
   }, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       cb(null, body);
@@ -84,37 +90,43 @@ function callApi(url, host, cb) {
 }
 
 function callQueueApi(host, cb) {
-  const url = `http://${rabbitUsername}:${rabbitPassword}@${host}:15672/api/queues`;
+  const url = `http://${host}:15672/api/queues`;
   callApi(url, host, cb);
 }
 
 function callNodesApi(host, cb) {
-  const url = `http://${rabbitUsername}:${rabbitPassword}@${host}:15672/api/nodes`;
+  const url = `http://${host}:15672/api/nodes`;
   callApi(url, host, cb);
 }
 
 function callConnectionsApi(host, cb) {
-  const url = `http://${rabbitUsername}:${rabbitPassword}@${host}:15672/api/connections`;
+  const url = `http://${host}:15672/api/connections`;
   callApi(url, host, cb);
 }
 
 function getQueueAndNodeInfo(configHosts, type, onceSuccessCb, failureCb, shouldReturnArray) {
+  // console.log('Loading persistence');
   storage.init().then(() => {
     storage.getItem('hosts').then((savedHosts) => {
+      // console.log('Persistence loaded, savedHosts:', savedHosts);
       let mergedHosts = _.union(savedHosts, configHosts);
-      async.some(mergedHosts, (host, someCallback) => {
+      async.someLimit(mergedHosts, 1, (host, someCallback) => {
         async.waterfall([
           (callback) => {
+            // console.log('querying queue, host', host);
             callQueueApi(host, (err, queueInfoList) => callback(err, queueInfoList));
           },
           (queueInfoList, callback) => {
+            // console.log('querying nodes');
             callNodesApi(host, (err, nodeInfoList) => callback(err, queueInfoList, nodeInfoList));
           },
           (queueInfoList, nodeInfoList, callback) => {
+            // console.log('querying connections');
             callConnectionsApi(host, (err, connectionInfoList) => callback(err, queueInfoList, nodeInfoList, connectionInfoList));
           },
           (queueInfoList, nodeInfoList, connectionInfoList, callback) => {
             let selectedHost = selectNode(configHosts, queueInfoList, nodeInfoList, connectionInfoList, type, shouldReturnArray);
+            // console.log('Node selected:', selectedHost);
             onceSuccessCb(selectedHost);
             callback(null);
           }
