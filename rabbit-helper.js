@@ -13,7 +13,7 @@ function extractHostName(longNodeName) {
   return longNodeName.split('@')[1];
 }
 
-function selectNode(hosts, queueInfoList, nodeInfoList, type, shouldReturnArray) {
+function selectNode(hosts, queueInfoList, nodeInfoList, connectionInfoList, type, shouldReturnArray) {
   if (_.isEmpty(nodeInfoList)) {
     // Nothing from API, connects to a random node
     return (_.sample(hosts));
@@ -28,27 +28,37 @@ function selectNode(hosts, queueInfoList, nodeInfoList, type, shouldReturnArray)
     // Persist list of nodes for next time
     storage.setItem('hosts', _.map(nodeNames, extractHostName));
 
+    let finalCount;
     if (type === 'publisher') {
       // Mosca makes non-durable queues, keep durable queues
       _.remove(queueInfoList, node => node.durable === true);
+      // queueCount example: Object {rabbit@rabbit1: 2, rabbit@rabbit2: 1, rabbit@rabbit3: 3}
+      let queueCount = _.countBy(queueInfoList, node => node.node);
+      // Add nodes with zero queues
+      _.forEach(nodeNames, nodeName => {
+        if (!queueCount[nodeName]) {
+          queueCount[nodeName] = 0;
+        }
+      });
+      finalCount = queueCount;
     } else {
-      // We use durable queues in consumers
-      _.remove(queueInfoList, node => node.durable === false);
+      // Subscriber logic
+      // connectionCount example: Object {rabbit@rabbit1: 2, rabbit@rabbit2: 1, rabbit@rabbit3: 3}
+      let connectionCount = _.countBy(connectionInfoList, node => node.node);  
+      // Add nodes with zero connections
+      _.forEach(nodeNames, nodeName => {
+        if (!connectionCount[nodeName]) {
+          connectionCount[nodeName] = 0;
+        }
+      });
+      finalCount = connectionCount;
     }
-    // queueCount example: Object {rabbit@rabbit1: 2, rabbit@rabbit2: 1, rabbit@rabbit3: 3}
-    let queueCount = _.countBy(queueInfoList, node => node.node);
-    // Add nodes with zero queues
-    _.forEach(nodeNames, nodeName => {
-      if (!queueCount[nodeName]) {
-        queueCount[nodeName] = 0;
-      }
-    });
 
-    let queueCountArr = _.map(queueCount, (count, name) => {
+    let finalCountArr = _.map(finalCount, (count, name) => {
       return { name, count };
     });
 
-    let nodesSortedByPrority = _.sortBy(queueCountArr, 'count');
+    let nodesSortedByPrority = _.sortBy(finalCountArr, 'count');
     let result;
     if (shouldReturnArray) {
       result = _.map(nodesSortedByPrority, node => extractHostName(node.name));
@@ -83,6 +93,11 @@ function callNodesApi(host, cb) {
   callApi(url, host, cb);
 }
 
+function callConnectionsApi(host, cb) {
+  const url = `http://${rabbitUsername}:${rabbitPassword}@${host}:15672/api/connections`;
+  callApi(url, host, cb);
+}
+
 function getQueueAndNodeInfo(configHosts, type, onceSuccessCb, failureCb, shouldReturnArray) {
   storage.init().then(() => {
     storage.getItem('hosts').then((savedHosts) => {
@@ -96,7 +111,10 @@ function getQueueAndNodeInfo(configHosts, type, onceSuccessCb, failureCb, should
             callNodesApi(host, (err, nodeInfoList) => callback(err, queueInfoList, nodeInfoList));
           },
           (queueInfoList, nodeInfoList, callback) => {
-            let selectedHost = selectNode(configHosts, queueInfoList, nodeInfoList, type, shouldReturnArray);
+            callConnectionsApi(host, (err, connectionInfoList) => callback(err, queueInfoList, nodeInfoList, connectionInfoList));
+          },
+          (queueInfoList, nodeInfoList, connectionInfoList, callback) => {
+            let selectedHost = selectNode(configHosts, queueInfoList, nodeInfoList, connectionInfoList, type, shouldReturnArray);
             onceSuccessCb(selectedHost);
             callback(null);
           }
