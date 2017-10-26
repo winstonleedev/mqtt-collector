@@ -76,7 +76,7 @@ function init() {
                 }).on('error', console.error);
             }).on('error', console.error);
         });
-    });
+    }, () => process.exit(1));
 }
 
 init();
