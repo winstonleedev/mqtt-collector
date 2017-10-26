@@ -26,21 +26,18 @@ const LogEntry = mongoose.model('Log entry', new mongoose.Schema({
     _id: Number,
     topic: String,
     payload: String
-}, {
-        collection: 'log'
-    }));
+}, { collection: 'log' }));
 
 function init() {
     debug('Config AMQP hosts:', rascalConfig.hosts);
-    rabbitHelper.selectRabbit(rascalConfig.hosts, 'subscriber', (hostName) => {
-        debug('Selected AMQP host:', hostName);
+    rabbitHelper.selectRabbits(rascalConfig.hosts, 'subscriber', (hostName) => {
+        debug('Selected AMQP host(s):', hostName);
         // Connect to AMQP with Rascal
         Rascal.Broker.create(Rascal.withDefaultConfig(rascalConfig.withRabbit(hostName)), function (err, broker) {
             if (err) {
                 debug('Error ', err);
                 return;
             }
-            debug('AMQP host:', hostName);
             debug('Collector is now UP!');
 
             broker.subscribe('s1', function (err, subscription) {
