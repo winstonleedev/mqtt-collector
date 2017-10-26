@@ -17,3 +17,4 @@ node_modules
 
 # Procfile env
 .production.env
+.node-persist

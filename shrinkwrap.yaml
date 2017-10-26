@@ -6,6 +6,7 @@ dependencies:
   dotenv: 4.0.0
   lodash: 4.17.4
   mongoose: 4.11.12
+  node-persist: 2.1.0
   promise: 8.0.1
   rascal: 2.3.2
   request: 2.83.0
@@ -263,9 +264,36 @@ packages:
   /inherits/2.0.3:
     resolution:
       integrity: sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
+  /is-absolute/0.2.6:
+    dependencies:
+      is-relative: 0.2.1
+      is-windows: 0.2.0
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-IN5p89uULvLYe5wto28XIjWxtes=
+  /is-relative/0.2.1:
+    dependencies:
+      is-unc-path: 0.1.2
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-0n9MfVFtF1+2ENuEu+7yPDvJeqU=
   /is-typedarray/1.0.0:
     resolution:
       integrity: sha1-5HnICFjfDBsR3dppQPlgEfzaSpo=
+  /is-unc-path/0.1.2:
+    dependencies:
+      unc-path-regex: 0.1.2
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-arBTpyVzwQJQ/0FqOBTDUXivObk=
+  /is-windows/0.2.0:
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-3hqm1j6indJIc3tp8f+LgALSEIw=
   /isarray/0.0.1:
     resolution:
       integrity: sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8=
@@ -338,6 +366,14 @@ packages:
       node: '>= 0.6'
     resolution:
       integrity: sha1-Cdejk/A+mVp5+K+Fe3Cp4KsWVXo=
+  /minimist/0.0.8:
+    resolution:
+      integrity: sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
+  /mkdirp/0.5.1:
+    dependencies:
+      minimist: 0.0.8
+    resolution:
+      integrity: sha1-MAV0OOrGz3+MR2fzhkjWaX11yQM=
   /mongodb-core/2.1.15:
     dependencies:
       bson: 1.0.4
@@ -390,6 +426,13 @@ packages:
   /nan/2.7.0:
     resolution:
       integrity: sha1-2Vv3IeyHfgjbJ27T/G63j5CDrUY=
+  /node-persist/2.1.0:
+    dependencies:
+      is-absolute: 0.2.6
+      mkdirp: 0.5.1
+      q: 1.1.2
+    resolution:
+      integrity: sha1-5lK784haBNrWo1PXQXYXfIORRwc=
   /oauth-sign/0.8.2:
     resolution:
       integrity: sha1-Rqarfwrq2N6unsBWV4C31O/rnUM=
@@ -410,6 +453,12 @@ packages:
   /punycode/1.4.1:
     resolution:
       integrity: sha1-wNWmOycYgArY4esPpSachN1BhF4=
+  /q/1.1.2:
+    engines:
+      node: '>=0.6.0'
+      teleport: '>=0.2.0'
+    resolution:
+      integrity: sha1-Y1fikSBnAdmfGXq4TlforRlvKok=
   /qs/6.5.1:
     engines:
       node: '>=0.6'
@@ -573,6 +622,11 @@ packages:
     optional: true
     resolution:
       integrity: sha1-WuaBd/GS1EViadEIr6k/+HQ/T2Q=
+  /unc-path-regex/0.1.2:
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-5z3T17DXxe2G+6xrCufYxqadUPo=
   /util-deprecate/1.0.2:
     resolution:
       integrity: sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
@@ -604,6 +658,7 @@ specifiers:
   dotenv: ^4.0.0
   lodash: ^4.17.4
   mongoose: ^4.11.12
+  node-persist: ^2.1.0
   promise: ^8.0.1
   rascal: ^2.3.2
   request: ^2.83.0
