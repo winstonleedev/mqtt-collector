@@ -6,7 +6,7 @@ const debug = require('debug')('collector');
 const mongoose = require('mongoose');
 const Rascal = require('rascal');
 const rascalConfig = require('./rascal-config');
-const rabbitHelper = require('./rabbit-helper.js');
+const rabbitHelper = require('rabbit-helper');
 
 // Configure host name for mongo
 var defaultHost = 'localhost';
