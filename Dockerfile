@@ -1,5 +1,5 @@
 FROM node:4
-LABEL maintainer="Thanh Phu <docker-maintenance@kii.systems>"
+LABEL maintainer="Thanh Phu https://github.com/thanhphu"
 
 WORKDIR /app
 COPY package.json /app
